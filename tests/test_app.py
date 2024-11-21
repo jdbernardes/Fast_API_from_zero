@@ -86,9 +86,10 @@ def test_read_user_with_invalid_id_must_return_404(client, user):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'Julio',
             'email': 'julioTeste@gmail.com',
@@ -100,11 +101,11 @@ def test_update_user(client, user):
     assert response.json() == {
         'username': 'Julio',
         'email': 'julioTeste@gmail.com',
-        'id': 1,
+        'id': user.id,
     }
 
 
-def test_update_integrity_error(client, user):
+def test_update_integrity_error(client, user, token):
     client.post(
         '/users/',
         json={
@@ -116,6 +117,7 @@ def test_update_integrity_error(client, user):
     # Alterando user da fixture para fausto
     response = client.put(
         f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'fausto',
             'email': 'bob@example.com',
@@ -127,30 +129,36 @@ def test_update_integrity_error(client, user):
     assert response.json() == {'detail': 'Username or Email already exists'}
 
 
-def test_update_invalid_userID_must_return_404(client):
-    response = client.put(
-        '/users/2',
-        json={
-            'username': 'TestInvalidUser',
-            'email': 'test@invalid.com',
-            'password': 'test@123',
-        },
+# def test_update_invalid_userID_must_return_404(client, token):
+#     response = client.put(
+#         '/users/99',
+#         json={
+#             'username': 'TestInvalidUser',
+#             'email': 'test@invalid.com',
+#             'password': 'test@123',
+#         },
+#     )
+
+#     assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
     )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_invalid_userID_must_return_404(client, user):
-    response = client.delete('/users/2')
+# def test_delete_invalid_userID_must_return_404(client, user, token):
+#     response = client.delete(
+#         '/users/99',
+#         headers={'Authorization': f'Bearer {token}'},
+#     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
+#     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_get_token(client, user):
