@@ -129,17 +129,28 @@ def test_update_integrity_error(client, user, token):
     assert response.json() == {'detail': 'Username or Email already exists'}
 
 
-# def test_update_invalid_userID_must_return_404(client, token):
-#     response = client.put(
-#         '/users/99',
-#         json={
-#             'username': 'TestInvalidUser',
-#             'email': 'test@invalid.com',
-#             'password': 'test@123',
-#         },
-#     )
+def test_update_other_userID_must_return_403(client, token, user):
+    client.post(
+        '/users/',
+        json={
+            'username': 'fausto',
+            'email': 'fausto@example.com',
+            'password': 'secret',
+        },
+    )
 
-#     assert response.status_code == HTTPStatus.NOT_FOUND
+    response = client.put(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'TestInvalidUser',
+            'email': 'test@invalid.com',
+            'password': 'test@123',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permission'}
 
 
 def test_delete_user(client, user, token):
@@ -152,13 +163,23 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-# def test_delete_invalid_userID_must_return_404(client, user, token):
-#     response = client.delete(
-#         '/users/99',
-#         headers={'Authorization': f'Bearer {token}'},
-#     )
+def test_delete_another_userID_must_return_403(client, user, token):
+    client.post(
+        '/users/',
+        json={
+            'username': 'fausto',
+            'email': 'fausto@example.com',
+            'password': 'secret',
+        },
+    )
 
-#     assert response.status_code == HTTPStatus.NOT_FOUND
+    response = client.delete(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
 def test_get_token(client, user):
@@ -171,3 +192,29 @@ def test_get_token(client, user):
     assert response.status_code == HTTPStatus.OK
     assert 'access_token' in token
     assert 'token_type' in token
+
+
+def test_get_token_with_invalid_email_must_return_400(client, user):
+    response = client.post(
+        '/token',
+        data={
+            'username': 'invalid@email.com',
+            'password': user.clean_password,
+        },
+    )
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect email or password'}
+
+
+def test_get_token_with_invalid_password_must_return_400(client, user):
+    response = client.post(
+        '/token',
+        data={
+            'username': user.email,
+            'password': 'invalid_password',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect email or password'}

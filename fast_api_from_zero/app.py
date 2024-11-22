@@ -114,10 +114,10 @@ def update_user(
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permission'
         )
-    if not current_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
-        )
+    # if not current_user:
+    #     raise HTTPException(
+    #         status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+    #     )
 
     try:
         current_user.username = user.username
@@ -144,10 +144,10 @@ def delete_user(
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
-    if not current_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
-        )
+    # if not current_user:
+    #     raise HTTPException(
+    #         status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+    #     )
     session.delete(current_user)
     session.commit()
 
