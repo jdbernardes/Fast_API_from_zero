@@ -21,3 +21,25 @@ def test_jwt_invalid_token(client):
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_jwt_with_unexisting_user_must_return_401(client):
+    data = {'sub': 'testUnexistingUser@test'}
+    token = create_access_token(data)
+    response = client.delete(
+        '/users/1', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_jwt_with_no_email_must_return_401(client):
+    data = {'no-email': 'testUnexistingUser@test'}
+    token = create_access_token(data)
+    response = client.delete(
+        '/users/1', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
