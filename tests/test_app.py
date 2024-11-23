@@ -70,7 +70,7 @@ def test_read_users_with_user(client, user):
 
 
 def test_read_user(client, user):
-    response = client.get('/user/1')
+    response = client.get('/users/1')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
@@ -81,7 +81,7 @@ def test_read_user(client, user):
 
 
 def test_read_user_with_invalid_id_must_return_404(client, user):
-    response = client.get('/user/2')
+    response = client.get('/users/2')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
 
@@ -184,7 +184,7 @@ def test_delete_another_userID_must_return_403(client, user, token):
 
 def test_get_token(client, user):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={'username': user.email, 'password': user.clean_password},
     )
     token = response.json()
@@ -196,7 +196,7 @@ def test_get_token(client, user):
 
 def test_get_token_with_invalid_email_must_return_400(client, user):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={
             'username': 'invalid@email.com',
             'password': user.clean_password,
@@ -209,7 +209,7 @@ def test_get_token_with_invalid_email_must_return_400(client, user):
 
 def test_get_token_with_invalid_password_must_return_400(client, user):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={
             'username': user.email,
             'password': 'invalid_password',
