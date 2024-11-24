@@ -24,7 +24,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session):
+def create_user(user: UserSchema, session: Session): # type: ignore comment
     db_user = session.scalar(
         select(User).where(
             (User.username == user.username) | (User.email == user.email)
@@ -57,7 +57,7 @@ def create_user(user: UserSchema, session: Session):
 @router.get('/', response_model=UserList)
 def read_users(
     filter_users: Annotated[FilterPage, Query()],
-    session: Session,
+    session: Session, # type: ignore comment
 ):
     users = session.scalars(
         select(User).offset(filter_users.offset).limit(filter_users.limit)
@@ -66,7 +66,7 @@ def read_users(
 
 
 @router.get('/{user_id}', response_model=UserPublic)
-def read_user(user_id: int, session: Session):
+def read_user(user_id: int, session: Session): # type: ignore comment
     db_user = session.scalar(select(User).where(User.id == user_id))
     if not db_user:
         raise HTTPException(
@@ -79,7 +79,7 @@ def read_user(user_id: int, session: Session):
 def update_user(
     user_id: int,
     user: UserSchema,
-    session: Session,
+    session: Session, # type: ignore comment
     current_user: CurrentUser,
 ):
     if current_user.id != user_id:
@@ -109,7 +109,7 @@ def update_user(
 @router.delete('/{user_id}', response_model=Message)
 def delete_user(
     user_id: int,
-    session: Session,
+    session: Session, # type: ignore comment
     current_user: CurrentUser,
 ):
     if current_user.id != user_id:
