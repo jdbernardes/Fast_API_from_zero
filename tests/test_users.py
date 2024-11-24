@@ -143,7 +143,7 @@ def test_update_other_userID_must_return_403(client, token, user):
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json() == {'detail': 'Not enough permission'}
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
 def test_delete_user(client, user, token):
