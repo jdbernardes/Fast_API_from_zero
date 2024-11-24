@@ -19,12 +19,12 @@ from fast_api_from_zero.security import get_current_user, get_password_hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 
-# Session = Annotated[Session, Depends(get_session)]
-# CurrentUser = Annotated[User, Depends(get_current_user)]
+Session = Annotated[Session, Depends(get_session)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
+def create_user(user: UserSchema, session: Session):
     db_user = session.scalar(
         select(User).where(
             (User.username == user.username) | (User.email == user.email)
@@ -57,7 +57,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 @router.get('/', response_model=UserList)
 def read_users(
     filter_users: Annotated[FilterPage, Query()],
-    session: Session = Depends(get_session),
+    session: Session,
 ):
     users = session.scalars(
         select(User).offset(filter_users.offset).limit(filter_users.limit)
@@ -66,7 +66,7 @@ def read_users(
 
 
 @router.get('/{user_id}', response_model=UserPublic)
-def read_user(user_id: int, session: Session = Depends(get_session)):
+def read_user(user_id: int, session: Session):
     db_user = session.scalar(select(User).where(User.id == user_id))
     if not db_user:
         raise HTTPException(
@@ -79,8 +79,8 @@ def read_user(user_id: int, session: Session = Depends(get_session)):
 def update_user(
     user_id: int,
     user: UserSchema,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: Session,
+    current_user: CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
@@ -109,8 +109,8 @@ def update_user(
 @router.delete('/{user_id}', response_model=Message)
 def delete_user(
     user_id: int,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: Session,
+    current_user: CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
