@@ -26,7 +26,7 @@ def test_create_user_with_existing_username_must_return_400_bad_request(
     response = client.post(
         '/users/',
         json={
-            'username': 'Teste',
+            'username': user.username,
             'email': 'juliocd.bernardes@gmail.com',
             'password': 'Teste@123',
         },
@@ -42,7 +42,7 @@ def test_create_user_with_existing_email_must_return_400_bad_request(
         '/users/',
         json={
             'username': 'Teste1',
-            'email': 'test@test.com',
+            'email': user.email,
             'password': 'Teste@123',
         },
     )
@@ -67,8 +67,8 @@ def test_read_user(client, user):
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Teste',
-        'email': 'test@test.com',
+        'username': 'Test6',
+        'email': 'Test6@test.com',
         'id': 1,
     }
 
@@ -122,18 +122,9 @@ def test_update_integrity_error(client, user, token):
     assert response.json() == {'detail': 'Username or Email already exists'}
 
 
-def test_update_other_userID_must_return_403(client, token, user):
-    client.post(
-        '/users/',
-        json={
-            'username': 'fausto',
-            'email': 'fausto@example.com',
-            'password': 'secret',
-        },
-    )
-
+def test_update_other_userID_must_return_403(client, token, other_user):
     response = client.put(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'TestInvalidUser',
@@ -156,18 +147,18 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_another_userID_must_return_403(client, user, token):
-    client.post(
-        '/users/',
-        json={
-            'username': 'fausto',
-            'email': 'fausto@example.com',
-            'password': 'secret',
-        },
-    )
+def test_delete_another_userID_must_return_403(client, other_user, token):
+    # client.post(
+    #     '/users/',
+    #     json={
+    #         'username': 'fausto',
+    #         'email': 'fausto@example.com',
+    #         'password': 'secret',
+    #     },
+    # )
 
     response = client.delete(
-        '/users/2',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
