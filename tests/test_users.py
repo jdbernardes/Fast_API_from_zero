@@ -67,8 +67,8 @@ def test_read_user(client, user):
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Test6',
-        'email': 'Test6@test.com',
+        'username': user.username,
+        'email': user.email,
         'id': 1,
     }
 
@@ -148,15 +148,6 @@ def test_delete_user(client, user, token):
 
 
 def test_delete_another_userID_must_return_403(client, other_user, token):
-    # client.post(
-    #     '/users/',
-    #     json={
-    #         'username': 'fausto',
-    #         'email': 'fausto@example.com',
-    #         'password': 'secret',
-    #     },
-    # )
-
     response = client.delete(
         f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
