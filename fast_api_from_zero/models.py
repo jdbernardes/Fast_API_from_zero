@@ -39,7 +39,7 @@ class Todo:
     __tablename__ = 'todos'
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    tittle: Mapped[str]
+    title: Mapped[str]
     description: Mapped[str]
     state: Mapped[TodoState]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
