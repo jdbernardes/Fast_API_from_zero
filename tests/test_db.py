@@ -23,13 +23,13 @@ def test_create_user(session, mock_db_time):
         'email': 'teste@test',
         'created_at': time,
         'updated_at': time,
-        'todos': []
+        'todos': [],
     }
 
 
 def test_create_todo(session, user: User):
     todo = Todo(
-        tittle='Teste Todo',
+        title='Teste Todo',
         description='Teste Desc',
         state='draft',
         user_id=user.id,
