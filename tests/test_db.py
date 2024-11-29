@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from sqlalchemy import select
 
-from fast_api_from_zero.models import User
+from fast_api_from_zero.models import Todo, User
 
 
 def test_create_user(session, mock_db_time):
@@ -23,4 +23,21 @@ def test_create_user(session, mock_db_time):
         'email': 'teste@test',
         'created_at': time,
         'updated_at': time,
+        'todos': []
     }
+
+
+def test_create_todo(session, user: User):
+    todo = Todo(
+        tittle='Teste Todo',
+        description='Teste Desc',
+        state='draft',
+        user_id=user.id,
+    )
+
+    session.add(todo)
+    session.commit()
+    session.refresh(todo)
+
+    user = session.scalar(select(User).where(User.id == user.id))
+    assert todo in user.todos
