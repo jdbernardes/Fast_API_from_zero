@@ -65,11 +65,6 @@ def mock_db_time():
 @pytest.fixture
 def user(session):
     password = 'testtest'
-    # user = User(
-    #     username='Teste',
-    #     email='test@test.com',
-    #     password=get_password_hash(password),
-    # )
     user = UserFactory(password=get_password_hash(password))
     session.add(user)
     session.commit()
@@ -83,11 +78,6 @@ def user(session):
 @pytest.fixture
 def other_user(session):
     password = 'testtest'
-    # user = User(
-    #     username='Teste',
-    #     email='test@test.com',
-    #     password=get_password_hash(password),
-    # )
     user = UserFactory(password=get_password_hash(password))
     session.add(user)
     session.commit()

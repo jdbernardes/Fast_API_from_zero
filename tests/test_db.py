@@ -27,17 +27,17 @@ def test_create_user(session, mock_db_time):
     }
 
 
-def test_create_todo(session, user: User):
-    todo = Todo(
-        title='Teste Todo',
-        description='Teste Desc',
-        state='draft',
-        user_id=user.id,
-    )
-
-    session.add(todo)
-    session.commit()
-    session.refresh(todo)
+def test_create_todo(session, user: User, mock_db_time):
+    with mock_db_time(model=Todo) as time:
+        new_todo = Todo(
+            title='text',
+            description='text',
+            state='draft',
+            user_id=user.id,
+        )
+        session.add(new_todo)
+        session.commit()
+        print(time)
 
     user = session.scalar(select(User).where(User.id == user.id))
-    assert todo in user.todos
+    assert new_todo in user.todos

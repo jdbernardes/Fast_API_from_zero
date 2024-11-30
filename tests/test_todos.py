@@ -1,19 +1,20 @@
 from http import HTTPStatus
 
-from fast_api_from_zero.models import TodoState
+from fast_api_from_zero.models import Todo, TodoState
 from tests.factories import TodoFactory
 
 
-def test_create_todo(client, token):
-    response = client.post(
-        '/todos/',
-        headers={'Authorization': f'Bearer {token}'},
-        json={
-            'title': 'Test todo',
-            'description': 'Test todo description',
-            'state': 'draft',
-        },
-    )
+def test_api_create_todo(client, token, mock_db_time):
+    with mock_db_time(model=Todo) as time:
+        response = client.post(
+            '/todos/',
+            headers={'Authorization': f'Bearer {token}'},
+            json={
+                'title': 'Test todo',
+                'description': 'Test todo description',
+                'state': 'draft',
+            },
+        )
 
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
@@ -21,6 +22,8 @@ def test_create_todo(client, token):
         'title': 'Test todo',
         'description': 'Test todo description',
         'state': 'draft',
+        'created_at': time.isoformat(),
+        'updated_at': time.isoformat(),
     }
 
 
@@ -34,6 +37,31 @@ def test_list_todos(session, client, user, token):
     )
 
     assert len(response.json()['todos']) == expected_todos
+
+
+def test_list_todos_validate_fields(
+    session, client, user, token, mock_db_time
+):
+    with mock_db_time(model=Todo) as time:
+        todo: TodoFactory = TodoFactory(user_id=user.id)
+        session.add(todo)
+        session.commit()
+
+    response = client.get(
+        '/todos/', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()['todos'] == [
+        {
+            'id': todo.id,
+            'title': todo.title,
+            'description': todo.description,
+            'state': todo.state,
+            'created_at': time.isoformat(),
+            'updated_at': time.isoformat(),
+        }
+    ]
 
 
 def test_list_todos_pagination_should_return_2_todos(
