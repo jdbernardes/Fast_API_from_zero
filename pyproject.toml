@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "fast-api-from-zero"
+name = "fast_api_from_zero"
 version = "0.1.0"
 description = ""
-authors = ["Júlio Bernardes <juliocd.bernardes@gmail.com>"]
+authors = ["Julio Bernardes <juliocd.bernardes@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.*"
+python = "3.12.*"
 fastapi = {extras = ["standard"], version = "^0.115.4"}
 sqlalchemy = "^2.0.36"
 pydantic-settings = "^2.6.1"
