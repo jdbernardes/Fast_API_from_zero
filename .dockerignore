@@ -3,6 +3,4 @@ htmlcov
 .venv
 .ruff_cache
 .pytest_cache
-alembic.ini
 .coverage
-database.db
