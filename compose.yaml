@@ -3,8 +3,6 @@ services:
     image: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - app_network
     environment:
       POSTGRES_USER: app_user
       POSTGRES_DB: app_db
@@ -22,13 +20,6 @@ services:
       - fastzero_database
     environment:
       DATABASE_URL: postgresql+psycopg://app_user:app_password@fastzero_database:5432/app_db
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge
 
 volumes:
   pgdata:
-    external: false
