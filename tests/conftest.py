@@ -7,23 +7,34 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
+from testcontainers.postgres import PostgresContainer
 
 # from sqlalchemy.pool import StaticPool
 from fast_api_from_zero.app import app
 from fast_api_from_zero.database import get_session
 from fast_api_from_zero.models import User, table_registry
 from fast_api_from_zero.security import get_password_hash
-from fast_api_from_zero.settings import Settings
+
+# from fast_api_from_zero.settings import Settings
+
+
+@pytest.fixture(scope='session')
+def engine():
+    with PostgresContainer('postgres:16', driver='psycopg') as postgres:
+        _engine = create_engine(postgres.get_connection_url())
+
+        with _engine.begin():
+            yield _engine
 
 
 @pytest.fixture
-def session():
+def session(engine):
     # engine = create_engine(
     #     'sqlite:///:memory:',
     #     connect_args={'check_same_thread': False},
     #     poolclass=StaticPool,
     # )
-    engine = create_engine(Settings().DATABASE_URL)
+
     table_registry.metadata.create_all(engine)
 
     with Session(engine) as session:
