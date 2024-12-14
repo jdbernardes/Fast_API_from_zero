@@ -5,6 +5,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Copy repository files to GH workflow
+        uses: actions/checkout@v3
+
       - name: Install o python
         uses: actions/setup-python@v5
         with:
